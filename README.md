@@ -12,6 +12,45 @@ It will then disable the self initited AP and connect to the provided SSID. If a
 
 ---
 
+## File Structure
+
+```txt
+├── app.py
+├── button.py
+├── led.py
+├── LICENSE
+├── logger.py
+├── __pycache__
+│   ├── button.cpython-311.pyc
+│   ├── led.cpython-311.pyc
+│   └── logger.cpython-311.pyc
+├── README.md
+├── requirements.txt
+├── rpi-btn-wifi-manager.service
+├── setup_service.sh
+└── wifi_config
+    ├── network_manager.py
+    ├── __pycache__
+    │   ├── network_manager.cpython-311.pyc
+    │   └── web_server.cpython-311.pyc
+    ├── static
+    │   ├── css
+    │   │   └── style.css
+    │   ├── images
+    │   │   ├── icons8-favicon-32.png
+    │   │   ├── icons8-favicon-64.png
+    │   │   ├── icons8-favicon-96.png
+    │   │   └── komorebi_background.jpg
+    │   └── js
+    │       ├── script.js
+    │       └── socket.io.js
+    ├── templates
+    │   ├── general.html
+    │   └── index.html
+    └── web_server.py
+```
+
+
 ## Hardware notes
 
 0. Clone the repo

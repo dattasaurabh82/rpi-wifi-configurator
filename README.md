@@ -123,7 +123,7 @@ sudo nmcli con add \
     <h1>[YOUR_PROJECT_NAME]</h1>
     ```
 
-5. Update network discovery interface names (edit file: ) 
+5. Update network discovery interface names (edit [app.py](app.py)) 
 
 Find the line
 

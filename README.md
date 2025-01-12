@@ -141,7 +141,7 @@ python -m venv venv
 source activate venv/bin/activate
 ```
 
-> You must leep the new venv's name as `venv` 
+> You must keep the new venv's name as `venv` 
 
 7. Install dependencies
 

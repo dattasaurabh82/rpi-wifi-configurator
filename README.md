@@ -10,6 +10,8 @@ You can then connect to that Access Point (Check out how to customize that below
 
 It will then disable the self initited AP and connect to the provided SSID. If all goes well and the credentials were, correct, it will connect successfully.
 
+![How Pi configurator works](assets/how_pi_configurator_works.png)
+
 ---
 
 ## File Structure

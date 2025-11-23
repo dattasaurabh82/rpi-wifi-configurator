@@ -701,9 +701,9 @@ setup_systemd_service() {
         exit 1
     fi
     
-    # Run setup_service.sh and capture output
+    # Run setup_service.sh and capture output (with environment variables)
     print_info "Running setup_service.sh..."
-    if bash "$INSTALL_DIR/setup_service.sh" > /tmp/setup_service.log 2>&1; then
+    if XDG_RUNTIME_DIR="$XDG_RUNTIME_DIR" DBUS_SESSION_BUS_ADDRESS="$DBUS_SESSION_BUS_ADDRESS" bash "$INSTALL_DIR/setup_service.sh" > /tmp/setup_service.log 2>&1; then
         print_success "Service script executed successfully"
     else
         print_error "Failed to run setup_service.sh"

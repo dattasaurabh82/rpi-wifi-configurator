@@ -368,7 +368,7 @@ prompt_ap_config() {
     
     # If empty, use default
     if [ -z "$AP_PASSWORD" ]; then
-        AP_PASSWORD="1234"
+        AP_PASSWORD="12345678"
         print_info "Using default password: 1234"
     else
         # Validate minimum length
@@ -534,17 +534,16 @@ create_nm_hotspot() {
     print_info "Password: $AP_PASSWORD"
     print_info "IP: 10.10.1.1/24"
     
-    if sudo nmcli con add \
+    if sudo nmcli connection add \
+        con-name hotspot \
         type wifi \
         ifname wlan0 \
-        con-name hotspot \
-        autoconnect no \
-        ssid "$AP_SSID" \
-        mode ap \
-        ipv4.method shared \
-        ipv4.addresses 10.10.1.1/24 \
+        wifi.mode ap \
+        wifi.ssid "$AP_SSID" \
         wifi-sec.key-mgmt wpa-psk \
-        wifi-sec.psk "$AP_PASSWORD" > /dev/null 2>&1; then
+        wifi-sec.psk "$AP_PASSWORD" \
+        ipv4.method shared \
+        ipv4.addresses 10.10.1.1/24 > /dev/null 2>&1; then
         
         print_success "Hotspot created successfully"
     else

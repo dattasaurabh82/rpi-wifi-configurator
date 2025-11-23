@@ -2,7 +2,9 @@
 
 ## TODO:
 
-- [ ] Handle --- What if the desired WIFI doesn't have any PWD?
+- [x] Handle --- What if the desired WIFI doesn't have any PWD?
+- [ ] Better: Add scan to get all wifi details before connecting ... ?
+- [ ] Add the correct IP address display .... 
 - [ ] uninstall script
 - [ ] usage of config template ini vs hardcoded defaults 
 - [ ] Check `http://link_to_install_script | sh` efforts

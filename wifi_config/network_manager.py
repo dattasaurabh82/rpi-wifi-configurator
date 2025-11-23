@@ -50,7 +50,7 @@ class NetworkManager:
                     "wifi-sec.psk", password
                 ], capture_output=True, text=True)
             else:
-                # Open network (no security)
+                # Open network (no security) - works for truly open AND OWE-TM
                 logger.info(f"[net..._manager.py][Action] Creating open connection profile for {ssid}...")
                 add_result = subprocess.run([
                     "nmcli", "con", "add",

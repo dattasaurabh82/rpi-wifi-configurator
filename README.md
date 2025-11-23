@@ -1,12 +1,19 @@
 # README
 
+## TODO:
+
+- [ ] uninstall script
+- [ ] usage of config template ini vs hardcoded defaults 
+
+---
+
 I never found a simple utility that headless-ly allows setting up wifi to a pi, without logging into it with a monitor and keyboard or pre-configuring it prior to setup with the wifi credentials. What if you can't use ethernet? Anf, what if you are using it in an installation or a setup where you can't be there and someone who is there doesn't know anything about SSH or is not into Linux? 
 
 Well I have a solution.. (Behold)
 
 Here with this utility, with the long press of a button, the rpi disconnects from any previously connected WiFi Access Points and creates a new Access Point. If the WiFi is not configured, then it doesn't matter. 
 
-You can then connect to that Access Point (Check out how to customize that below), navigate to [http://10.10.1.1:8080](http://10.10.1.1:8080) and provide a SSID and PWD for a visible 2.5GHz network that you what your rpi to connect to. 
+You can then connect to that Access Point (Check out how to customize that below), navigate to [http://10.10.1.1:4000](http://10.10.1.1:4000) and provide a SSID and PWD for a visible 2.5GHz network that you what your rpi to connect to. 
 
 It will then disable the self initiated AP and connect to the provided SSID. If all goes well and the credentials were, correct, it will connect successfully.
 
@@ -18,7 +25,10 @@ It will then disable the self initiated AP and connect to the provided SSID. If 
 
 ```txt
 ├── app.py
+├── assets/
 ├── button.py
+├── config.template.ini
+├── install.sh
 ├── led.py
 ├── LICENSE
 ├── logger.py
@@ -26,18 +36,19 @@ It will then disable the self initiated AP and connect to the provided SSID. If 
 ├── requirements.txt
 ├── rpi-btn-wifi-manager.service
 ├── setup_service.sh
+├── uninstall.sh
 └── wifi_config
     ├── network_manager.py
     ├── static
-    │   ├── css
-    │   │   └── style.css
-    │   ├── images/*
-    │   └── js
-    │       ├── script.js
-    │       └── socket.io.js
+    │   ├── css
+    │   │   └── style.css
+    │   ├── images/*
+    │   └── js
+    │       ├── script.js
+    │       └── socket.io.js
     ├── templates
-    │   ├── general.html
-    │   └── index.html
+    │   ├── general.html
+    │   └── index.html
     └── web_server.py
 ```
 
@@ -137,7 +148,7 @@ sudo nmcli con add \
 Find the line
 
 ```python
-logger.info(f"[app.py][Status] Connect to wifi access point: {AP_SSID} and go to: http://serialmonitor.local:8080 or http://serialmonitor.lan :8080 to provide 2.5GHz Wifi credentials")
+logger.info(f"[app.py][Status] Connect to wifi access point: {AP_SSID} and go to: http://[IP]:4000 to provide 2.5GHz Wifi credentials")
 ```
 
 And, update `http://serialmonitor...` to either your ip or if network interface name is set, update to that. 
@@ -196,14 +207,22 @@ You still have ot start it.
 
 1. Very simple, if everything is wired up correctly and configured correctly, you can just long press the button for more than 4 sec and then the LED should `BLINK`.
 2. Soon you should see the raspberry pi's AP mode's hotspot ([Step 3](https://github.com/dattasaurabh82/rpi-wifi-configurator/tree/main?tab=readme-ov-file#how-to-customize-wifi-settings)).
-3. Join that with whatever PWD you set in [Step 3](https://github.com/dattasaurabh82/rpi-wifi-configurator/tree/main?tab=readme-ov-file#how-to-customize-wifi-settings).
-4. Then go to a browser and type in [http://10.10.1.1:8080](http://10.10.1.1:8080).
+3. Join that with whatever PWD you set (or the default, if you have not customized the AP configs) in [Step 3](https://github.com/dattasaurabh82/rpi-wifi-configurator/tree/main?tab=readme-ov-file#how-to-customize-wifi-settings).
+4. Then go to a browser and type in [http://10.10.1.1:4000](http://10.10.1.1:4000).
 5. Enter the 2.5 GHz SSID name and PWD of the WiFi you want the pi to connect to.
 6. If all goes well, you wil see the LED `BREATHING`; meaning it's attempting to connect to the wifi you just provided.
 7. If it succeeds, the LED will go `SOLID` and then turn `OFF`, meaning it has successfully connected. 
 8. If not, it will still blink, meaning, it's still in AP mode.
 9. This means that the rpi is disconnecting from any previous WIFI and setting up an access point. 
 
+---
+
+### DEFAULT AP DETAILS:
+
+- **SSID**: `RPI_NET_SETUP`
+- **PWD**: `123456789`
+
+---
 
 | LED STATE | STATUS |
 |----------|----------|

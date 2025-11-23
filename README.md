@@ -2,6 +2,7 @@
 
 ## TODO:
 
+- [ ] Handle --- What if the desired WIFI doesn't have any PWD?
 - [ ] uninstall script
 - [ ] usage of config template ini vs hardcoded defaults 
 - [ ] Check `http://link_to_install_script | sh` efforts

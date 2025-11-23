@@ -19,11 +19,22 @@ togglePasswordBtn.addEventListener('click', () => {
 function connectToWifi() {
     const ssid = networkNameInput.value;
     const password = passwordInput.value;
-    if (ssid && password) {
+    
+    // OLD
+    // if (ssid && password) {
+    //     socket.emit('connect_wifi', { ssid, password });
+    //     statusDiv.textContent = 'Connecting...';
+    // } else {
+    //     alert('Please enter a network name and password.');
+    // }
+
+    // NEW
+    if (ssid) {
+        // Password is optional (for open networks)
         socket.emit('connect_wifi', { ssid, password });
         statusDiv.textContent = 'Connecting...';
     } else {
-        alert('Please enter a network name and password.');
+        alert('Please enter a network name.');
     }
 }
 

@@ -91,7 +91,7 @@ def serve_image(filename):
 def handle_connect_wifi(data):
     global is_ap_mode, last_connection_success
     ssid = data['ssid']
-    password = data['password']
+    password = data.get('password', '')  # Default to empty string for open networks
     
     # Set LED to breathing while attempting connection
     status_led.set_state(LED.SLOW_BREATH)

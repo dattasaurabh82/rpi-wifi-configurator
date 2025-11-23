@@ -35,17 +35,30 @@ class NetworkManager:
         connection_exists = ssid in check_result.stdout
         
         if not connection_exists:
-            # Create new connection profile with explicit WPA-PSK security
-            logger.info(f"[net..._manager.py][Action] Creating new connection profile for {ssid}...")
-            add_result = subprocess.run([
-                "nmcli", "con", "add",
-                "type", "wifi",
-                "con-name", ssid,
-                "ifname", "wlan0",
-                "ssid", ssid,
-                "wifi-sec.key-mgmt", "wpa-psk",
-                "wifi-sec.psk", password
-            ], capture_output=True, text=True)
+            # Create new connection profile
+            # Check if this is an open network (no password) or secured network
+            if password:
+                # Secured network with WPA-PSK
+                logger.info(f"[net..._manager.py][Action] Creating secured connection profile for {ssid}...")
+                add_result = subprocess.run([
+                    "nmcli", "con", "add",
+                    "type", "wifi",
+                    "con-name", ssid,
+                    "ifname", "wlan0",
+                    "ssid", ssid,
+                    "wifi-sec.key-mgmt", "wpa-psk",
+                    "wifi-sec.psk", password
+                ], capture_output=True, text=True)
+            else:
+                # Open network (no security)
+                logger.info(f"[net..._manager.py][Action] Creating open connection profile for {ssid}...")
+                add_result = subprocess.run([
+                    "nmcli", "con", "add",
+                    "type", "wifi",
+                    "con-name", ssid,
+                    "ifname", "wlan0",
+                    "ssid", ssid
+                ], capture_output=True, text=True)
             
             if add_result.returncode != 0:
                 logger.error(f"[net..._manager.py][Error] Failed to create connection: {add_result.stderr}")

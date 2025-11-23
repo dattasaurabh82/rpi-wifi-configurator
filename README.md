@@ -238,7 +238,7 @@ You still have ot start it.
 Saurabh Datta
 zigzag.is [Principal Designer]
 Berlin
-January 2025
+January 2025 (2nd iteration, Dec 2025)
+hi@dattasaurabh.com
 ```
 
-Enjoy :)

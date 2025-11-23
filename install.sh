@@ -648,24 +648,46 @@ setup_systemd_service() {
         return 0
     fi
     
-    # Run the existing setup_service.sh script
-    if [ -f "$INSTALL_DIR/setup_service.sh" ]; then
-        print_info "Running setup_service.sh..."
-        bash "$INSTALL_DIR/setup_service.sh" > /dev/null 2>&1
-        
-        if [ $? -eq 0 ]; then
-            print_success "Service installed and enabled"
-            print_info "Service will start automatically on boot"
-        else
-            print_error "Failed to setup service"
-            print_info "You can try manually with:"
-            print_info "  cd $INSTALL_DIR"
-            print_info "  ./setup_service.sh"
-            exit 1
-        fi
-    else
+    # Check if setup_service.sh exists
+    if [ ! -f "$INSTALL_DIR/setup_service.sh" ]; then
         print_error "setup_service.sh not found!"
         exit 1
+    fi
+    
+    # Check if service template exists
+    if [ ! -f "$INSTALL_DIR/rpi-btn-wifi-manager.service" ]; then
+        print_error "rpi-btn-wifi-manager.service template not found!"
+        exit 1
+    fi
+    
+    # Run setup_service.sh and capture output
+    print_info "Running setup_service.sh..."
+    if bash "$INSTALL_DIR/setup_service.sh" > /tmp/setup_service.log 2>&1; then
+        print_success "Service script executed successfully"
+    else
+        print_error "Failed to run setup_service.sh"
+        print_info "Check log at: /tmp/setup_service.log"
+        cat /tmp/setup_service.log
+        exit 1
+    fi
+    
+    # Verify service file was created
+    if [ -f "$HOME/.config/systemd/user/rpi-btn-wifi-manager.service" ]; then
+        print_success "Service file installed"
+    else
+        print_error "Service file not found at: $HOME/.config/systemd/user/rpi-btn-wifi-manager.service"
+        print_info "Check log at: /tmp/setup_service.log"
+        cat /tmp/setup_service.log
+        exit 1
+    fi
+    
+    # Verify service is enabled
+    if systemctl --user is-enabled rpi-btn-wifi-manager.service &>/dev/null; then
+        print_success "Service enabled successfully"
+        print_info "Service will start automatically on boot"
+    else
+        print_warning "Service may not be enabled"
+        print_info "You can enable it with: systemctl --user enable rpi-btn-wifi-manager"
     fi
 }
 

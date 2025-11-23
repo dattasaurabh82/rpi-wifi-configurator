@@ -248,6 +248,24 @@ check_gpio_permissions() {
     fi
 }
 
+check_systemd_linger() {
+    print_info "Checking systemd user session..."
+    
+    if [ "$DRY_RUN" = true ]; then
+        print_success "Linger enabled (simulated)"
+        return 0
+    fi
+    
+    # Check if linger is enabled for current user
+    if ! loginctl show-user "$USER" -p Linger | grep -q "Linger=yes"; then
+        print_info "Enabling systemd linger for user services..."
+        sudo loginctl enable-linger "$USER"
+        print_success "Systemd linger enabled"
+    else
+        print_success "Systemd linger already enabled"
+    fi
+}
+
 check_existing_installation() {
     print_info "Checking for existing installation..."
     
@@ -703,12 +721,25 @@ setup_systemd_service() {
     
     # Run setup_service.sh and capture output (with environment variables)
     print_info "Running setup_service.sh..."
-    if XDG_RUNTIME_DIR="$XDG_RUNTIME_DIR" DBUS_SESSION_BUS_ADDRESS="$DBUS_SESSION_BUS_ADDRESS" bash "$INSTALL_DIR/setup_service.sh" > /tmp/setup_service.log 2>&1; then
+    
+    # Use a user-writable log location
+    local LOG_FILE="$HOME/.cache/setup_service.log"
+    mkdir -p "$HOME/.cache"
+    
+    if env XDG_RUNTIME_DIR="$XDG_RUNTIME_DIR" DBUS_SESSION_BUS_ADDRESS="$DBUS_SESSION_BUS_ADDRESS" bash "$INSTALL_DIR/setup_service.sh" > "$LOG_FILE" 2>&1; then
         print_success "Service script executed successfully"
     else
         print_error "Failed to run setup_service.sh"
-        print_info "Check log at: /tmp/setup_service.log"
-        cat /tmp/setup_service.log
+        print_info "Check log at: $LOG_FILE"
+        cat "$LOG_FILE"
+        
+        # Check if this is a D-Bus/systemd user service issue
+        if grep -q "Failed to connect to user scope bus" "$LOG_FILE"; then
+            echo ""
+            print_warning "Systemd user service setup requires proper session"
+            print_info "Run: sudo loginctl enable-linger $USER"
+            print_info "Then try the installer again"
+        fi
         exit 1
     fi
     
@@ -747,6 +778,7 @@ main() {
     check_python
     check_internet
     check_gpio_permissions
+    check_systemd_linger
     check_existing_installation
     echo ""
     

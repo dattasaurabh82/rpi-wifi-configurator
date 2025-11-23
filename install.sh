@@ -34,7 +34,7 @@ AP_PASSWORD=""
 
 print_header() {
     echo -e "${BLUE}╔══════════════════════════════════════════════════════╗${NC}"
-    echo -e "${BLUE}║  RPi WiFi Configurator - Automated Setup            ║${NC}"
+    echo -e "${BLUE}║  RPi WiFi Configurator - Automated Setup             ║${NC}"
     echo -e "${BLUE}╚══════════════════════════════════════════════════════╝${NC}"
     echo ""
 }

@@ -7,6 +7,7 @@ import math
 class LED:
     SOLID = "SOLID"
     FAST_BLINK = "FAST"
+    SLOW_BLINK = "SLOW"
     SLOW_BREATH = "BREATH"
     OFF = "OFF"
 
@@ -36,10 +37,19 @@ class LED:
         """Single blink cycle with controlled brightness"""
         if self.led.value:  # If LED is on, turn it off
             self.led.value = False
-            return 0.5  # Off for 200ms
+            return 0.5  # Off for 500ms
         else:  # If LED is off, turn it on with PWM
             self._pwm_cycle(1.0)  # One PWM cycle at max allowed brightness
-            return 0.5  # On for 200ms
+            return 0.5  # On for 500ms
+
+    def _slow_blink(self):
+        """Slower blink cycle for disconnected state"""
+        if self.led.value:  # If LED is on, turn it off
+            self.led.value = False
+            return 1.5  # Off for 1.5s
+        else:  # If LED is off, turn it on with PWM
+            self._pwm_cycle(1.0)  # One PWM cycle at max allowed brightness
+            return 1.5  # On for 1.5s
 
     def _slow_breath(self):
         """Creates a smooth breathing effect using sine wave"""
@@ -68,6 +78,8 @@ class LED:
         while self._running:
             if self._state == self.FAST_BLINK:
                 sleep_time = self._fast_blink()
+            elif self._state == self.SLOW_BLINK:
+                sleep_time = self._slow_blink()
             elif self._state == self.SLOW_BREATH:
                 sleep_time = self._slow_breath()
             elif self._state == self.SOLID:

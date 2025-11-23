@@ -212,6 +212,15 @@ You still have ot start it.
 
 ## How to Use
 
+### Default AP Credentials
+
+If you haven't customized the AP settings, use these defaults:
+
+- **SSID**: `RPI_NET_SETUP`
+- **Password**: `12345678`
+
+### Usage Steps
+
 1. Very simple, if everything is wired up correctly and configured correctly, you can just long press the button for more than 4 sec and then the LED should `BLINK`.
 2. Soon you should see the raspberry pi's AP mode's hotspot ([Step 3](https://github.com/dattasaurabh82/rpi-wifi-configurator/tree/main?tab=readme-ov-file#how-to-customize-wifi-settings)).
 3. Join that with whatever PWD you set (or the default, if you have not customized the AP configs) in [Step 3](https://github.com/dattasaurabh82/rpi-wifi-configurator/tree/main?tab=readme-ov-file#how-to-customize-wifi-settings).
@@ -224,18 +233,35 @@ You still have ot start it.
 
 ---
 
-### DEFAULT AP DETAILS:
+## LED Status Indicators
 
-- **SSID**: `RPI_NET_SETUP`
-- **PWD**: `123456789`
+The LED provides visual feedback about the WiFi configuration state:
 
----
+| LED State | Pattern | Description |
+|-----------|---------|-------------|
+| **OFF** | No light | Connected to WiFi (normal operation) |
+| **SLOW_BLINK** | Gentle blink (1.5s on/off) | WiFi disconnected or not found |
+| **FAST_BLINK** | Quick blink (0.5s on/off) | AP mode active (ready for configuration) |
+| **SLOW_BREATH** | Smooth breathing effect | Attempting to connect to WiFi |
+| **SOLID** | Constant on (2 seconds) | WiFi connection successful (then turns OFF) |
 
-| LED STATE | STATUS |
-|----------|----------|
-| FAST_BLINK = "FAST" | In AP Mode |
-| BREATHING | Connecting to user provided SSID |
-| SOLID & the OFF| Successfully connected to user provided SSID |
+### State Transitions
+
+```
+Boot → SLOW_BLINK (searching for WiFi)
+     ↓
+     WiFi Found → SOLID (2s) → OFF (connected)
+     ↓
+     WiFi Lost → SLOW_BLINK (disconnected)
+     
+Long Press → FAST_BLINK (AP mode active)
+     ↓
+     User Configures → SLOW_BREATH (attempting connection)
+     ↓
+     Success → SOLID (2s) → OFF (connected)
+     ↓
+     Failure → FAST_BLINK (back to AP mode)
+```
 
 ---
 

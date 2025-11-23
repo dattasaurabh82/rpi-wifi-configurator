@@ -103,7 +103,17 @@ def main():
     
     # Initialize last known state
     last_known_ip = NetworkManager.get_current_ip()
-    last_known_mode = "normal" if last_known_ip != AP_SELF_IP else "ap"
+    
+    # Determine initial mode based on connection state
+    if NetworkManager.is_in_ap_mode():
+        last_known_mode = "ap"
+        status_led.set_state(LED.FAST_BLINK)
+    elif NetworkManager.is_connected_to_wifi():
+        last_known_mode = "connected"
+        status_led.set_state(LED.OFF)
+    else:
+        last_known_mode = "disconnected"
+        status_led.set_state(LED.SLOW_BLINK)
     
     try:
         while True:
@@ -111,15 +121,29 @@ def main():
             current_ip = NetworkManager.get_current_ip()
             
             if NetworkManager.is_in_ap_mode():
+                # Case 1: AP mode active
                 if last_known_mode != "ap":
                     logger.info("[app.py][Action] Switched to AP mode.")
                     switch_to_ap_mode()
+                    status_led.set_state(LED.FAST_BLINK)
                     last_known_mode = "ap"
-            elif current_ip != AP_SELF_IP and NetworkManager.is_connected_to_wifi():
-                if last_known_mode != "normal":
+                    
+            elif NetworkManager.is_connected_to_wifi():
+                # Case 2: Connected to WiFi
+                if last_known_mode != "connected":
                     logger.info("[app.py][Action] Connected to Wi-Fi. Switching to normal mode...")
                     switch_to_normal_mode()
-                    last_known_mode = "normal"
+                    status_led.set_state(LED.SOLID)
+                    time.sleep(2)
+                    status_led.set_state(LED.OFF)
+                    last_known_mode = "connected"
+                    
+            else:
+                # Case 3: Not in AP mode and not connected = disconnected/searching
+                if last_known_mode != "disconnected":
+                    logger.info("[app.py][Action] WiFi disconnected or not found.")
+                    status_led.set_state(LED.SLOW_BLINK)
+                    last_known_mode = "disconnected"
             
             last_known_ip = current_ip
     except KeyboardInterrupt:

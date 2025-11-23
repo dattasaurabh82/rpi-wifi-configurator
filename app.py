@@ -113,7 +113,7 @@ def main():
         status_led.set_state(LED.OFF)
     else:
         last_known_mode = "disconnected"
-        status_led.set_state(LED.SLOW_BLINK)
+        status_led.set_state(LED.SLOW_BREATH)  # Breathing for disconnected state
     
     try:
         while True:
@@ -142,7 +142,7 @@ def main():
                 # Case 3: Not in AP mode and not connected = disconnected/searching
                 if last_known_mode != "disconnected":
                     logger.info("[app.py][Action] WiFi disconnected or not found.")
-                    status_led.set_state(LED.SLOW_BLINK)
+                    status_led.set_state(LED.SLOW_BREATH)  # Breathing for disconnected state
                     last_known_mode = "disconnected"
             
             last_known_ip = current_ip

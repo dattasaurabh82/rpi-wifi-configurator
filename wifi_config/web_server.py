@@ -39,6 +39,7 @@ server_running = False
 server_thread = None
 is_ap_mode = False
 last_connection_success = False
+is_connecting = False  # Flag to indicate connection attempt in progress
 
 
 # ------------------------------------------- #

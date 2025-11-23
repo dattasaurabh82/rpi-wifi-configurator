@@ -240,19 +240,18 @@ The LED provides visual feedback about the WiFi configuration state:
 | LED State | Pattern | Description |
 |-----------|---------|-------------|
 | **OFF** | No light | Connected to WiFi (normal operation) |
-| **SLOW_BLINK** | Gentle blink (1.5s on/off) | WiFi disconnected or not found |
+| **SLOW_BREATH** | Smooth breathing effect | WiFi disconnected, searching, or attempting connection |
 | **FAST_BLINK** | Quick blink (0.5s on/off) | AP mode active (ready for configuration) |
-| **SLOW_BREATH** | Smooth breathing effect | Attempting to connect to WiFi |
 | **SOLID** | Constant on (2 seconds) | WiFi connection successful (then turns OFF) |
 
 ### State Transitions
 
 ```
-Boot → SLOW_BLINK (searching for WiFi)
+Boot → SLOW_BREATH (searching for WiFi)
      ↓
      WiFi Found → SOLID (2s) → OFF (connected)
      ↓
-     WiFi Lost → SLOW_BLINK (disconnected)
+     WiFi Lost → SLOW_BREATH (disconnected)
      
 Long Press → FAST_BLINK (AP mode active)
      ↓

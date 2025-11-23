@@ -4,10 +4,10 @@ After=network.target
 
 [Service]
 Type=simple
-WorkingDirectory=/home/asdff/wifi-manager-btn
+WorkingDirectory=__INSTALL_DIR__
 Environment=PATH=/usr/bin:/usr/sbin:/bin:/sbin:${PATH}
-Environment=VIRTUAL_ENV=/home/asdff/wifi-manager-btn/venv
-ExecStart=/home/asdff/wifi-manager-btn/venv/bin/python3 app.py
+Environment=VIRTUAL_ENV=__INSTALL_DIR__/venv
+ExecStart=__INSTALL_DIR__/venv/bin/python3 app.py
 Restart=always
 RestartSec=10
 

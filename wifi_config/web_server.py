@@ -4,7 +4,31 @@ from wifi_config.network_manager import NetworkManager
 from logger import logger
 from time import sleep
 from led import LED
+import configparser
+import os
+
+
+
 status_led: LED = None  # Type hint
+
+# ------------------------------------------- #
+# ************* Load Configuration ********** #
+# ------------------------------------------- #
+
+# Load PORT and AP_SSID from config.ini
+config = configparser.ConfigParser()
+config_path = os.path.join(os.path.dirname(__file__), '..', 'config.ini')
+
+if os.path.exists(config_path):
+    config.read(config_path)
+    PORT = config.getint('server', 'port', fallback=4000)
+    AP_SSID = config.get('access_point', 'ap_ssid', fallback='SERIAL_MONITOR_PI4')
+    logger.info(f"[web_server.py][Config] Loaded from config.ini: PORT={PORT}, AP_SSID={AP_SSID}")
+else:
+    PORT = 4000
+    AP_SSID = 'SERIAL_MONITOR_PI4'
+    logger.warning("[web_server.py][Config] config.ini not found, using defaults")
+
 
 # ------------------------------------------- #
 # ************* Global Variables ************ #
@@ -12,7 +36,6 @@ status_led: LED = None  # Type hint
 
 server_running = False
 server_thread = None
-PORT = 8080
 is_ap_mode = False
 last_connection_success = False
 
@@ -44,12 +67,11 @@ def test_disconnect():
 
 @app.route('/')
 def index():
-    # Note: TBT: In the new method suggested by ai these global vars are remobved, why?
     global is_ap_mode, last_connection_success
     if is_ap_mode and not last_connection_success:
-        return render_template('index.html')
+        return render_template('index.html', project_name=AP_SSID)
     else:
-        return render_template('general.html')
+        return render_template('general.html', project_name=AP_SSID)
 
 
 # ------------------------------------------- #

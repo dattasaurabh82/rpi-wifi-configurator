@@ -5,3 +5,11 @@ venv/*
 .DS_Store
 **/.DS_Store
 *.log
+
+# Installation artifacts
+config.ini
+config.ini.backup
+.wifi_backup.json
+
+# Log directory
+logs/

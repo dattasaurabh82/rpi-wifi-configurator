@@ -7,8 +7,8 @@
 - [ ] Implement usage of config template ini vs hardcoded defaults 
 - [x] Add the correct IP address display ...
 - [x] Clean exit
-- [ ] Add "permission issues with PolicyKit for Debian Trixie" (for non-sudo usage) methods in install script ... 
-- [ ] 
+- [x] Add "permission issues with PolicyKit for Debian Trixie" (for non-sudo usage) methods in install script ... 
+- [x] LED show status if pi can;t find wifi after boot
 - [x] uninstall script
 - [ ] Check `http://link_to_install_script | sh` efforts
 

@@ -1,6 +1,6 @@
 # README
 
-I never found a simple utility that headlessly allows setting up wifi to a pi, without logging into it with a monitor and keyboard or preconfiguring it prior to setup with the wifi creds. What if you can't use ethernet? Andf, what if you are using it in an installation or a setup where you can't be there and someone who is there doesn't know anything about SSH or is not into Linux? 
+I never found a simple utility that headless-ly allows setting up wifi to a pi, without logging into it with a monitor and keyboard or pre-configuring it prior to setup with the wifi credentials. What if you can't use ethernet? Anf, what if you are using it in an installation or a setup where you can't be there and someone who is there doesn't know anything about SSH or is not into Linux? 
 
 Well I have a solution.. (Behold)
 
@@ -8,7 +8,7 @@ Here with this utility, with the long press of a button, the rpi disconnects fro
 
 You can then connect to that Access Point (Check out how to customize that below), navigate to [http://10.10.1.1:8080](http://10.10.1.1:8080) and provide a SSID and PWD for a visible 2.5GHz network that you what your rpi to connect to. 
 
-It will then disable the self initited AP and connect to the provided SSID. If all goes well and the credentials were, correct, it will connect successfully.
+It will then disable the self initiated AP and connect to the provided SSID. If all goes well and the credentials were, correct, it will connect successfully.
 
 ![How Pi configurator works](assets/how_pi_configurator_works.png)
 
@@ -44,20 +44,39 @@ It will then disable the self initited AP and connect to the provided SSID. If a
 
 ## Hardware notes
 
-0. Clone the repo
-
-```bash
-git clone https://github.com/dattasaurabh82/rpi-wifi-configurator.git
-```
+![Wiring Diagram](assets/wiring.png)
 
 1. Connect Button to  `GPIO 23 `
 2. Connect LED to  `GPIO 24`
 
-> If you want to use a different pin for the button to reconfigure Wifi (for whatever reason) make sure to after changing them, makes the changes in the script. You can do so by editing [app.py](app.py). Find the line `WIFI_RESET_PIN = 23` and change it there. 
+> [!Warning]
+> If you want to use a different pin for the button to reconfigure Wifi (for whatever reason) make sure to after changing them (in ), makes the changes in the script. You can do so by editing [app.py](app.py). Find the line `WIFI_RESET_PIN = 23` and change it there. 
 
-![Wiring Diagram](assets/wiring.png)
 
-## How to customize WIFI Settings
+## Quick Installation - Automated Setup (Recommended)
+
+```bash
+git clone https://github.com/dattasaurabh82/rpi-wifi-configurator.git
+cd rpi-wifi-configurator
+./install.sh
+```
+
+The installer will:
+- Check system requirements
+- Prompt for GPIO pins and AP credentials
+- Create virtual environment and install dependencies
+- Configure NetworkManager hotspot
+- Set up systemd service
+
+## Manual Setup & Installation
+
+### Customizing HW pins
+
+- If you want to use a different pin for the button to reconfigure Wifi (for whatever reason) make sure to after changing them (in ), makes the changes in the script. You can do so by editing [app.py](app.py). Find the line `WIFI_RESET_PIN = 23` and change it there. 
+
+
+
+### Customizing WIFI Settings
 
 1. Create a new branch before making adjustments to your new pi project
 
@@ -140,10 +159,10 @@ python -m pip install -r requirements.txt
 
 8. Test Script
 
-> Better run it when a monitor and keyboard is attached to the pi, as if you are SSHed into the rpi, then when it creates an AP, you will lose connection to your tunnel, until you connect to it's AP again as it disconnectes from any associated station.
+> Better run it when a monitor and keyboard is attached to the pi, as if you are SSHed into the rpi, then when it creates an AP, you will lose connection to your tunnel, until you connect to it's AP again as it disconnects from any associated station.
 
 ```bash
-pyhton app.py
+python app.py
 ```
 
 Now you can _Long Press_ (> 4 sec) and you will see the prompts ...
@@ -175,12 +194,12 @@ You still have ot start it.
 ## How to Use
 
 1. Very simple, if everything is wired up correctly and configured correctly, you can just long press the button for more than 4 sec and then the LED should `BLINK`.
-2. Soon you shoud see the raspberry pi's AP mode's hotspot ([Step 3](https://github.com/dattasaurabh82/rpi-wifi-configurator/tree/main?tab=readme-ov-file#how-to-customize-wifi-settings)).
+2. Soon you should see the raspberry pi's AP mode's hotspot ([Step 3](https://github.com/dattasaurabh82/rpi-wifi-configurator/tree/main?tab=readme-ov-file#how-to-customize-wifi-settings)).
 3. Join that with whatever PWD you set in [Step 3](https://github.com/dattasaurabh82/rpi-wifi-configurator/tree/main?tab=readme-ov-file#how-to-customize-wifi-settings).
 4. Then go to a browser and type in [http://10.10.1.1:8080](http://10.10.1.1:8080).
 5. Enter the 2.5 GHz SSID name and PWD of the WiFi you want the pi to connect to.
 6. If all goes well, you wil see the LED `BREATHING`; meaning it's attempting to connect to the wifi you just provided.
-7. If it succeeds, the LED will go `SOLID` and then turn `OFF`, meaning it has sucessfully connected. 
+7. If it succeeds, the LED will go `SOLID` and then turn `OFF`, meaning it has successfully connected. 
 8. If not, it will still blink, meaning, it's still in AP mode.
 9. This means that the rpi is disconnecting from any previous WIFI and setting up an access point. 
 
@@ -189,7 +208,7 @@ You still have ot start it.
 |----------|----------|
 | FAST_BLINK = "FAST" | In AP Mode |
 | BREATHING | Connecting to user provided SSID |
-| SOLID & the OFF| Successfuly connected to user provided SSID |
+| SOLID & the OFF| Successfully connected to user provided SSID |
 
 ---
 

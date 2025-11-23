@@ -82,7 +82,8 @@ The installer will:
 
 ```bash
 # Create & switch to your branch
-git checkout -b [A_SUITABLE_NAME_PROJECT]
+git branch [A_SUITABLE_NAME_PROJECT]
+git checkout [A_SUITABLE_NAME_PROJECT]
 ```
 
 2. In [app.py](app.py) change the SSID name

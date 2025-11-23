@@ -479,7 +479,9 @@ create_nm_hotspot() {
     
     if [ "$DRY_RUN" = true ]; then
         print_success "Would check for 'hotspot' connection"
+        print_success "Would disconnect from current WiFi"
         print_success "Would create hotspot with SSID: $AP_SSID"
+        print_success "Would reconnect to WiFi"
         return 0
     fi
     
@@ -516,6 +518,16 @@ create_nm_hotspot() {
         esac
     fi
     
+    # Temporarily disconnect from WiFi to allow hotspot creation
+    print_info "Temporarily disconnecting from WiFi..."
+    CURRENT_CONNECTION=$(nmcli -t -f NAME con show --active | grep -v '^lo$' | head -n1)
+    
+    if [ -n "$CURRENT_CONNECTION" ]; then
+        sudo nmcli con down "$CURRENT_CONNECTION" > /dev/null 2>&1
+        print_success "Disconnected from: $CURRENT_CONNECTION"
+        sleep 3
+    fi
+    
     # Create new hotspot connection
     print_info "Creating NetworkManager hotspot connection..."
     print_info "SSID: $AP_SSID"
@@ -543,6 +555,14 @@ create_nm_hotspot() {
         print_info "    ipv4.method shared ipv4.addresses 10.10.1.1/24 \\"
         print_info "    wifi-sec.key-mgmt wpa-psk wifi-sec.psk \"$AP_PASSWORD\""
         exit 1
+    fi
+
+    # Reconnect to previous WiFi
+    if [ -n "$CURRENT_CONNECTION" ]; then
+        print_info "Reconnecting to WiFi..."
+        sleep 2
+        sudo nmcli con up "$CURRENT_CONNECTION" > /dev/null 2>&1
+        print_success "Reconnected to: $CURRENT_CONNECTION"
     fi
 }
 

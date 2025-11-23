@@ -471,6 +471,82 @@ setup_python_venv() {
 }
 
 # ============================================
+# NetworkManager hotspot setup
+# ============================================
+
+create_nm_hotspot() {
+    print_info "Checking for existing hotspot connection..."
+    
+    if [ "$DRY_RUN" = true ]; then
+        print_success "Would check for 'hotspot' connection"
+        print_success "Would create hotspot with SSID: $AP_SSID"
+        return 0
+    fi
+    
+    # Check if hotspot connection already exists
+    if sudo nmcli con show hotspot &> /dev/null; then
+        print_warning "Hotspot connection 'hotspot' already exists"
+        echo ""
+        echo "  Options:"
+        echo "  [1] Keep existing hotspot"
+        echo "  [2] Delete and recreate"
+        echo "  [3] Exit"
+        echo ""
+        read -p "  Choice [1]: " choice
+        choice=${choice:-1}
+        
+        case $choice in
+            1)
+                print_info "Keeping existing hotspot connection"
+                return 0
+                ;;
+            2)
+                print_info "Deleting existing hotspot..."
+                sudo nmcli con delete hotspot
+                print_success "Existing hotspot deleted"
+                ;;
+            3)
+                print_error "Installation cancelled"
+                exit 1
+                ;;
+            *)
+                print_error "Invalid choice"
+                exit 1
+                ;;
+        esac
+    fi
+    
+    # Create new hotspot connection
+    print_info "Creating NetworkManager hotspot connection..."
+    print_info "SSID: $AP_SSID"
+    print_info "Password: $AP_PASSWORD"
+    print_info "IP: 10.10.1.1/24"
+    
+    if sudo nmcli con add \
+        type wifi \
+        ifname wlan0 \
+        con-name hotspot \
+        autoconnect no \
+        ssid "$AP_SSID" \
+        mode ap \
+        ipv4.method shared \
+        ipv4.addresses 10.10.1.1/24 \
+        wifi-sec.key-mgmt wpa-psk \
+        wifi-sec.psk "$AP_PASSWORD" > /dev/null 2>&1; then
+        
+        print_success "Hotspot created successfully"
+    else
+        print_error "Failed to create hotspot"
+        print_info "You can try manually with:"
+        print_info "  sudo nmcli con add type wifi ifname wlan0 con-name hotspot \\"
+        print_info "    autoconnect no ssid \"$AP_SSID\" mode ap \\"
+        print_info "    ipv4.method shared ipv4.addresses 10.10.1.1/24 \\"
+        print_info "    wifi-sec.key-mgmt wpa-psk wifi-sec.psk \"$AP_PASSWORD\""
+        exit 1
+    fi
+}
+
+# ============================================
 # Main installation flow
 # ============================================
 
@@ -506,11 +582,15 @@ main() {
     setup_python_venv
     echo ""
     
-    # TODO: Steps 5-7 will be implemented next
-    print_info "Python environment ready!"
+    # Step 5: NetworkManager hotspot creation
+    print_step "5" "$TOTAL_STEPS" "Configuring NetworkManager hotspot"
+    create_nm_hotspot
+    echo ""
+    
+    # TODO: Steps 6-7 will be implemented next
+    print_info "Hotspot configured!"
     echo ""
     echo "  Next steps to implement:"
-    echo "    5. NetworkManager hotspot creation"
     echo "    6. Service setup"
     echo "    7. Installation complete"
     echo ""

@@ -590,14 +590,28 @@ configure_network_permissions() {
         print_info "Detected modern PolicyKit structure"
         
         print_info "Creating PolicyKit rule: $RULES_FILE"
-        sudo tee "$RULES_FILE" > /dev/null <<EOF
+        
+        # Create temp file first, then move with sudo
+        cat > /tmp/networkmanager-polkit.rules <<'EOFTEMP'
 polkit.addRule(function(action, subject) {
     if (action.id.indexOf("org.freedesktop.NetworkManager.") == 0 &&
-        subject.user == "$CURRENT_USER") {
+        subject.user == "USERPLACEHOLDER") {
         return polkit.Result.YES;
     }
 });
-EOF
+EOFTEMP
+        
+        # Replace placeholder with actual username
+        sed -i "s/USERPLACEHOLDER/$CURRENT_USER/g" /tmp/networkmanager-polkit.rules
+        
+        # Move to final location with sudo
+        if sudo mv /tmp/networkmanager-polkit.rules "$RULES_FILE"; then
+            sudo chmod 644 "$RULES_FILE"
+        else
+            print_error "Failed to move PolicyKit rule to $RULES_FILE"
+            rm -f /tmp/networkmanager-polkit.rules
+            exit 1
+        fi
         
     elif [ -d "/etc/polkit-1/localauthority/50-local.d" ]; then
         # Legacy PolicyKit (Buster/Bullseye)
@@ -606,14 +620,28 @@ EOF
         print_info "Detected legacy PolicyKit structure"
         
         print_info "Creating PolicyKit rule: $RULES_FILE"
-        sudo tee "$RULES_FILE" > /dev/null <<EOF
-[Allow $CURRENT_USER to control networking]
-Identity=unix-user:$CURRENT_USER
+        
+        # Create temp file first, then move with sudo
+        cat > /tmp/networkmanager-polkit.pkla <<'EOFTEMP'
+[Allow USERPLACEHOLDER to control networking]
+Identity=unix-user:USERPLACEHOLDER
 Action=org.freedesktop.NetworkManager.*
 ResultAny=yes
 ResultInactive=yes
 ResultActive=yes
-EOF
+EOFTEMP
+        
+        # Replace placeholder with actual username
+        sed -i "s/USERPLACEHOLDER/$CURRENT_USER/g" /tmp/networkmanager-polkit.pkla
+        
+        # Move to final location with sudo
+        if sudo mv /tmp/networkmanager-polkit.pkla "$RULES_FILE"; then
+            sudo chmod 644 "$RULES_FILE"
+        else
+            print_error "Failed to move PolicyKit rule to $RULES_FILE"
+            rm -f /tmp/networkmanager-polkit.pkla
+            exit 1
+        fi
         
     else
         print_error "Could not detect PolicyKit directory structure"
@@ -624,7 +652,8 @@ EOF
         exit 1
     fi
     
-    if [ -f "$RULES_FILE" ]; then
+    # Verify the file was created (need sudo to check since directory is restricted)
+    if sudo test -f "$RULES_FILE"; then
         print_success "PolicyKit rule created for user: $CURRENT_USER"
         print_info "NetworkManager can now be controlled without sudo"
     else

@@ -22,6 +22,12 @@ INSTALL_DIR="$SCRIPT_DIR"
 DRY_RUN=false
 TOTAL_STEPS=7
 
+# Configuration variables
+BUTTON_GPIO_PIN=""
+LED_GPIO_PIN=""
+AP_SSID=""
+AP_PASSWORD=""
+
 # ============================================
 # Helper functions
 # ============================================
@@ -318,6 +324,105 @@ check_existing_installation() {
 }
 
 # ============================================
+# Configuration functions
+# ============================================
+
+prompt_hardware_config() {
+    print_info "GPIO Pin Configuration:"
+    print_info "----------------------"
+    
+    # Button GPIO Pin
+    read -p "  Button GPIO Pin [23]: " BUTTON_GPIO_PIN
+    BUTTON_GPIO_PIN=${BUTTON_GPIO_PIN:-23}
+    
+    # Validate it's a number
+    if ! [[ "$BUTTON_GPIO_PIN" =~ ^[0-9]+$ ]]; then
+        print_error "Invalid GPIO pin number"
+        exit 1
+    fi
+    
+    # LED GPIO Pin
+    read -p "  LED GPIO Pin [24]: " LED_GPIO_PIN
+    LED_GPIO_PIN=${LED_GPIO_PIN:-24}
+    
+    # Validate it's a number
+    if ! [[ "$LED_GPIO_PIN" =~ ^[0-9]+$ ]]; then
+        print_error "Invalid GPIO pin number"
+        exit 1
+    fi
+    
+    print_success "GPIO pins configured: Button=${BUTTON_GPIO_PIN}, LED=${LED_GPIO_PIN}"
+}
+
+prompt_ap_config() {
+    print_info "Access Point Settings:"
+    print_info "---------------------"
+    
+    # AP SSID
+    read -p "  AP Name [RPI_NET_SETUP]: " AP_SSID
+    AP_SSID=${AP_SSID:-RPI_NET_SETUP}
+    
+    # AP Password
+    read -s -p "  AP Password (Leave empty for default '1234', min 8 chars if custom): " AP_PASSWORD
+    echo ""
+    
+    # If empty, use default
+    if [ -z "$AP_PASSWORD" ]; then
+        AP_PASSWORD="1234"
+        print_info "Using default password: 1234"
+    else
+        # Validate minimum length
+        if [ ${#AP_PASSWORD} -lt 8 ]; then
+            print_error "Password must be at least 8 characters"
+            exit 1
+        fi
+    fi
+    
+    print_success "Access Point configured: SSID=${AP_SSID}"
+}
+
+create_config_file() {
+    print_info "Creating configuration file..."
+    
+    if [ "$DRY_RUN" = true ]; then
+        print_success "Would create config.ini with:"
+        echo "    Button GPIO: $BUTTON_GPIO_PIN"
+        echo "    LED GPIO: $LED_GPIO_PIN"
+        echo "    AP SSID: $AP_SSID"
+        echo "    AP Password: $AP_PASSWORD"
+        return 0
+    fi
+    
+    # Check if config.ini already exists and we're in overwrite mode
+    local backup_config=false
+    if [ -f "$INSTALL_DIR/config.ini" ]; then
+        print_info "Backing up existing config.ini..."
+        cp "$INSTALL_DIR/config.ini" "$INSTALL_DIR/config.ini.backup"
+        backup_config=true
+    fi
+    
+    # Create config.ini from template
+    cat > "$INSTALL_DIR/config.ini" <<EOF
+[hardware]
+button_gpio_pin = $BUTTON_GPIO_PIN
+led_gpio_pin = $LED_GPIO_PIN
+
+[access_point]
+ap_ssid = $AP_SSID
+ap_password = $AP_PASSWORD
+
+[server]
+port = 4000
+EOF
+    
+    if [ "$backup_config" = true ]; then
+        print_success "Configuration created (backup saved as config.ini.backup)"
+    else
+        print_success "Configuration created: config.ini"
+    fi
+}
+
+# ============================================
 # Main installation flow
 # ============================================
 
@@ -334,12 +439,24 @@ main() {
     check_existing_installation
     echo ""
     
-    # TODO: Steps 2-7 will be implemented next
-    print_info "Pre-flight checks complete!"
+    # Step 2: Hardware configuration
+    print_step "2" "$TOTAL_STEPS" "Hardware configuration"
+    echo ""
+    prompt_hardware_config
+    echo ""
+    
+    # Step 3: Access Point configuration
+    print_step "3" "$TOTAL_STEPS" "Access Point configuration"
+    echo ""
+    prompt_ap_config
+    echo ""
+    create_config_file
+    echo ""
+    
+    # TODO: Steps 4-7 will be implemented next
+    print_info "Configuration complete!"
     echo ""
     echo "  Next steps to implement:"
-    echo "    2. Hardware configuration prompts"
-    echo "    3. Access point configuration prompts"
     echo "    4. Python venv setup"
     echo "    5. NetworkManager hotspot creation"
     echo "    6. Service setup"

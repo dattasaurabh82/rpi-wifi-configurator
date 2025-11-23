@@ -363,13 +363,13 @@ prompt_ap_config() {
     AP_SSID=${AP_SSID:-RPI_NET_SETUP}
     
     # AP Password
-    read -s -p "  AP Password (Leave empty for default '1234', min 8 chars if custom): " AP_PASSWORD
+    read -s -p "  AP Password (Leave empty for default '12345678', min 8 chars if custom): " AP_PASSWORD
     echo ""
     
     # If empty, use default
     if [ -z "$AP_PASSWORD" ]; then
         AP_PASSWORD="12345678"
-        print_info "Using default password: 1234"
+        print_info "Using default password: 12345678"
     else
         # Validate minimum length
         if [ ${#AP_PASSWORD} -lt 8 ]; then

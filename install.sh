@@ -20,7 +20,7 @@ NC='\033[0m' # No Color
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 INSTALL_DIR="$SCRIPT_DIR"
 DRY_RUN=false
-TOTAL_STEPS=7
+TOTAL_STEPS=8  # Updated to include PolicyKit configuration
 
 # Configuration variables
 BUTTON_GPIO_PIN=""
@@ -566,6 +566,76 @@ create_nm_hotspot() {
 }
 
 # ============================================
+# NetworkManager PolicyKit configuration
+# ============================================
+
+configure_network_permissions() {
+    print_info "Configuring NetworkManager permissions for non-root access..."
+    
+    if [ "$DRY_RUN" = true ]; then
+        print_success "Would configure PolicyKit for user: $(whoami)"
+        print_success "Would create rule in /etc/polkit-1/rules.d/"
+        return 0
+    fi
+    
+    local CURRENT_USER=$(whoami)
+    local POLKIT_DIR=""
+    local RULES_FILE=""
+    
+    # Detect PolicyKit directory structure
+    if [ -d "/etc/polkit-1/rules.d" ]; then
+        # Modern PolicyKit (Trixie/Bookworm)
+        POLKIT_DIR="/etc/polkit-1/rules.d"
+        RULES_FILE="$POLKIT_DIR/50-networkmanager-$CURRENT_USER.rules"
+        print_info "Detected modern PolicyKit structure"
+        
+        print_info "Creating PolicyKit rule: $RULES_FILE"
+        sudo tee "$RULES_FILE" > /dev/null <<EOF
+polkit.addRule(function(action, subject) {
+    if (action.id.indexOf("org.freedesktop.NetworkManager.") == 0 &&
+        subject.user == "$CURRENT_USER") {
+        return polkit.Result.YES;
+    }
+});
+EOF
+        
+    elif [ -d "/etc/polkit-1/localauthority/50-local.d" ]; then
+        # Legacy PolicyKit (Buster/Bullseye)
+        POLKIT_DIR="/etc/polkit-1/localauthority/50-local.d"
+        RULES_FILE="$POLKIT_DIR/50-networkmanager-$CURRENT_USER.pkla"
+        print_info "Detected legacy PolicyKit structure"
+        
+        print_info "Creating PolicyKit rule: $RULES_FILE"
+        sudo tee "$RULES_FILE" > /dev/null <<EOF
+[Allow $CURRENT_USER to control networking]
+Identity=unix-user:$CURRENT_USER
+Action=org.freedesktop.NetworkManager.*
+ResultAny=yes
+ResultInactive=yes
+ResultActive=yes
+EOF
+        
+    else
+        print_error "Could not detect PolicyKit directory structure"
+        print_error "This tool requires PolicyKit to control NetworkManager without sudo"
+        print_info "Expected directories:"
+        print_info "  - /etc/polkit-1/rules.d (modern systems)"
+        print_info "  - /etc/polkit-1/localauthority/50-local.d (legacy systems)"
+        exit 1
+    fi
+    
+    if [ -f "$RULES_FILE" ]; then
+        print_success "PolicyKit rule created for user: $CURRENT_USER"
+        print_info "NetworkManager can now be controlled without sudo"
+    else
+        print_error "Failed to create PolicyKit rule"
+        print_error "Cannot proceed - NetworkManager requires PolicyKit configuration"
+        print_info "Please check sudo permissions and try again"
+        exit 1
+    fi
+}
+
+# ============================================
 # Service setup
 # ============================================
 
@@ -641,13 +711,18 @@ main() {
     create_nm_hotspot
     echo ""
     
-    # Step 6: Service setup
-    print_step "6" "$TOTAL_STEPS" "Setting up systemd service"
+    # Step 6: NetworkManager PolicyKit permissions
+    print_step "6" "$TOTAL_STEPS" "Configuring NetworkManager permissions"
+    configure_network_permissions
+    echo ""
+    
+    # Step 7: Service setup
+    print_step "7" "$TOTAL_STEPS" "Setting up systemd service"
     setup_systemd_service
     echo ""
     
-    # Step 7: Installation complete
-    print_step "7" "$TOTAL_STEPS" "Installation complete!"
+    # Step 8: Installation complete
+    print_step "8" "$TOTAL_STEPS" "Installation complete!"
     echo ""
     print_success "WiFi configurator installed successfully!"
     echo ""

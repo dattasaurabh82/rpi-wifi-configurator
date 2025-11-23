@@ -4,9 +4,9 @@
 
 - [x] Handle --- What if the desired WIFI doesn't have any PWD?
 - [ ] Better: Add scan to get all wifi details before connecting ... ?
-- [ ] Implement sage of config template ini vs hardcoded defaults 
+- [ ] Implement usage of config template ini vs hardcoded defaults 
 - [x] Add the correct IP address display ...
-- [ ] Clean exit
+- [x] Clean exit
 - [ ] Add "permission issues with PolicyKit for Debian Trixie" (for non-sudo usage) methods in install script ... 
 - [ ] 
 - [ ] uninstall script

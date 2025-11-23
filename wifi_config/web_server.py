@@ -150,3 +150,9 @@ def switch_to_normal_mode():
     is_ap_mode = False
     last_connection_success = True
     logger.info("[web_server.py][Status] Switched to normal mode")
+    
+def init_app(led: LED):
+    """Initialize the web server with the LED instance"""
+    global status_led
+    status_led = led
+    logger.info("[web_server.py][Status] LED instance initialized in web server")

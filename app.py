@@ -18,19 +18,22 @@ config = configparser.ConfigParser()
 config_path = os.path.join(os.path.dirname(__file__), 'config.ini')
 
 # Read config if exists, otherwise use defaults
+# Read config if exists, otherwise use defaults
 if os.path.exists(config_path):
     config.read(config_path)
     AP_SELF_IP = config.get('access_point', 'ap_ip', fallback='10.10.1.1')
     AP_SSID = config.get('access_point', 'ap_ssid', fallback='RPI_NET_SETUP')
     WIFI_RESET_PIN = config.getint('hardware', 'button_gpio_pin', fallback=23)
     LED_PIN = config.getint('hardware', 'led_gpio_pin', fallback=24)
-    logger.info(f"[app.py][Config] Loaded from config.ini: SSID={AP_SSID}, Button={WIFI_RESET_PIN}, LED={LED_PIN}")
+    PORT = config.getint('server', 'port', fallback=4000)
+    logger.info(f"[app.py][Config] Loaded from config.ini: SSID={AP_SSID}, Button={WIFI_RESET_PIN}, LED={LED_PIN}, PORT={PORT}")
 else:
     # Fallback to defaults if config.ini doesn't exist
     AP_SELF_IP = "10.10.1.1"
     AP_SSID = "RPI_NET_SETUP"
     WIFI_RESET_PIN = 23
     LED_PIN = 24
+    PORT = 4000
     logger.warning("[app.py][Config] config.ini not found, using defaults")
 
 
@@ -65,7 +68,7 @@ def on_long_press():
     reset_wifi_state()  # Reset the WiFi state
     switch_to_ap_mode()
 
-    logger.info(f"[app.py][Result] AP mode activated. Connect to the Wi-Fi and navigate to http://{AP_SELF_IP}:4000")
+    logger.info(f"[app.py][Result] AP mode activated. Connect to the Wi-Fi and navigate to http://{AP_SELF_IP}:{PORT}")
 
 
 # ------------------------------------------ #
@@ -136,7 +139,7 @@ logger.info("-----------------------")
 # If wifi connected print IP address. if not type a message below
 logger.info(f"[app.py][Status] Current IP: {NetworkManager.get_current_ip()}")
 if NetworkManager.get_current_ip() == AP_SELF_IP:
-    logger.info(f"[app.py][Status] Connect to wifi access point: {AP_SSID} and go to: http://serialmonitor.local:4000 or http://serialmonitor.lan :4000 to provide 2.5GHz Wifi credentials")
+    logger.info(f"[app.py][Status] Connect to wifi access point: {AP_SSID} and go to: http://serialmonitor.local:{PORT} or http://serialmonitor.lan:{PORT} to provide 2.5GHz Wifi credentials")
 else:
     logger.info("[app.py][Status] To configure wifi, Long Press the Wifi Reset Button for more than 5 sec")
     

@@ -94,7 +94,8 @@ class NetworkManager:
     @staticmethod
     def get_current_ip():
         # Get IP address specifically from wlan0 (WiFi interface)
-        cmd = "ip -4 addr show wlan0 | grep -oP '(?<=inet\s)\d+(\.\d+){3}'"
+        # Using raw string to avoid escape sequence warning
+        cmd = r"ip -4 addr show wlan0 | grep -oP '(?<=inet\s)\d+(\.\d+){3}'"
         result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
         ip = result.stdout.strip()
         

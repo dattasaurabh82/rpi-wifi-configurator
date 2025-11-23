@@ -186,4 +186,4 @@ main() {
 }
 
 # Run main uninstallation
-main"
+main

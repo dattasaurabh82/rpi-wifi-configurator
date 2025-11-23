@@ -547,6 +547,41 @@ create_nm_hotspot() {
 }
 
 # ============================================
+# Service setup
+# ============================================
+
+setup_systemd_service() {
+    print_info "Setting up systemd service..."
+    
+    if [ "$DRY_RUN" = true ]; then
+        print_success "Would run setup_service.sh"
+        print_success "Would enable rpi-btn-wifi-manager.service"
+        return 0
+    fi
+    
+    # Run the existing setup_service.sh script
+    if [ -f "$INSTALL_DIR/setup_service.sh" ]; then
+        print_info "Running setup_service.sh..."
+        bash "$INSTALL_DIR/setup_service.sh" > /dev/null 2>&1
+        
+        if [ $? -eq 0 ]; then
+            print_success "Service installed and enabled"
+            print_info "Service will start automatically on boot"
+        else
+            print_error "Failed to setup service"
+            print_info "You can try manually with:"
+            print_info "  cd $INSTALL_DIR"
+            print_info "  ./setup_service.sh"
+            exit 1
+        fi
+    else
+        print_error "setup_service.sh not found!"
+        exit 1
+    fi
+}
+
+
+# ============================================
 # Main installation flow
 # ============================================
 
@@ -587,12 +622,45 @@ main() {
     create_nm_hotspot
     echo ""
     
-    # TODO: Steps 6-7 will be implemented next
-    print_info "Hotspot configured!"
+    # Step 6: Service setup
+    print_step "6" "$TOTAL_STEPS" "Setting up systemd service"
+    setup_systemd_service
     echo ""
-    echo "  Next steps to implement:"
-    echo "    6. Service setup"
-    echo "    7. Installation complete"
+    
+    # Step 7: Installation complete
+    print_step "7" "$TOTAL_STEPS" "Installation complete!"
+    echo ""
+    print_success "WiFi configurator installed successfully!"
+    echo ""
+    echo "╔══════════════════════════════════════════════════════╗"
+    echo "║  Installation Summary                                ║"
+    echo "╚══════════════════════════════════════════════════════╝"
+    echo ""
+    print_info "Installation directory: $INSTALL_DIR"
+    print_info "Configuration file: config.ini"
+    print_info "Service: rpi-btn-wifi-manager.service"
+    echo ""
+    print_info "Access Point Credentials:"
+    echo "     SSID: $AP_SSID"
+    echo "     Password: $AP_PASSWORD"
+    echo ""
+    print_info "Start the service:"
+    echo "     systemctl --user start rpi-btn-wifi-manager"
+    echo ""
+    print_info "Check status:"
+    echo "     systemctl --user status rpi-btn-wifi-manager"
+    echo ""
+    print_info "Reconfigure settings:"
+    echo "     cd $INSTALL_DIR && python3 configure.py"
+    echo ""
+    print_info "Uninstall:"
+    echo "     cd $INSTALL_DIR && ./uninstall.sh"
+    echo ""
+    print_info "Usage:"
+    echo "     1. Long press button (4+ sec) to enter AP mode"
+    echo "     2. Connect to WiFi: $AP_SSID"
+    echo "     3. Open browser: http://10.10.1.1:4000"
+    echo "     4. Enter target WiFi credentials"
     echo ""
     
     if [ "$DRY_RUN" = true ]; then

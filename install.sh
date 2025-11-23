@@ -423,6 +423,54 @@ EOF
 }
 
 # ============================================
+# Python venv setup functions
+# ============================================
+
+setup_python_venv() {
+    print_info "Creating virtual environment 'venv'..."
+    
+    if [ "$DRY_RUN" = true ]; then
+        print_success "Would create venv at: $INSTALL_DIR/venv"
+        print_success "Would upgrade pip"
+        print_success "Would install 30 packages from requirements.txt"
+        return 0
+    fi
+    
+    # Remove existing venv if it exists and we're doing fresh install
+    if [ -d "$INSTALL_DIR/venv" ]; then
+        print_info "Removing existing virtual environment..."
+        rm -rf "$INSTALL_DIR/venv"
+    fi
+    
+    # Create new venv
+    python3 -m venv "$INSTALL_DIR/venv"
+    print_success "Virtual environment created"
+    
+    # Upgrade pip
+    print_info "Upgrading pip..."
+    "$INSTALL_DIR/venv/bin/python" -m pip install --upgrade pip > /dev/null 2>&1
+    print_success "Pip upgraded"
+    
+    # Install dependencies
+    print_info "Installing dependencies from requirements.txt..."
+    print_info "This may take a few minutes..."
+    
+    # Install with progress
+    if "$INSTALL_DIR/venv/bin/pip" install -r "$INSTALL_DIR/requirements.txt" > /tmp/pip_install.log 2>&1; then
+        local pkg_count=$(grep -c "Successfully installed" /tmp/pip_install.log || echo "30")
+        print_success "All dependencies installed successfully"
+        rm -f /tmp/pip_install.log
+    else
+        print_error "Failed to install dependencies"
+        print_info "Check log at: /tmp/pip_install.log"
+        print_info "You can try manually with:"
+        print_info "  source $INSTALL_DIR/venv/bin/activate"
+        print_info "  pip install -r $INSTALL_DIR/requirements.txt"
+        exit 1
+    fi
+}
+
+# ============================================
 # Main installation flow
 # ============================================
 
@@ -453,11 +501,15 @@ main() {
     create_config_file
     echo ""
     
-    # TODO: Steps 4-7 will be implemented next
-    print_info "Configuration complete!"
+    # Step 4: Python venv setup
+    print_step "4" "$TOTAL_STEPS" "Setting up Python environment"
+    setup_python_venv
+    echo ""
+    
+    # TODO: Steps 5-7 will be implemented next
+    print_info "Python environment ready!"
     echo ""
     echo "  Next steps to implement:"
-    echo "    4. Python venv setup"
     echo "    5. NetworkManager hotspot creation"
     echo "    6. Service setup"
     echo "    7. Installation complete"

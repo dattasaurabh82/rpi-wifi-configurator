@@ -93,9 +93,18 @@ class NetworkManager:
 
     @staticmethod
     def get_current_ip():
-        cmd = "hostname -I | awk '{print $1}'"
+        # Get IP address specifically from wlan0 (WiFi interface)
+        cmd = "ip -4 addr show wlan0 | grep -oP '(?<=inet\s)\d+(\.\d+){3}'"
         result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-        return result.stdout.strip()
+        ip = result.stdout.strip()
+        
+        # If wlan0 has no IP, fall back to first available IP
+        if not ip:
+            cmd = "hostname -I | awk '{print $1}'"
+            result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+            ip = result.stdout.strip()
+        
+        return ip
     
     @staticmethod
     def is_connected_to_wifi():

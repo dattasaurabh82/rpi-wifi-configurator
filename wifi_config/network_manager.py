@@ -19,15 +19,62 @@ class NetworkManager:
     
     @staticmethod
     def connect_to_wifi(ssid, password):
-        cmd = f"nmcli dev wifi connect '{ssid}' password '{password}'"
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+        # First, bring down the hotspot if it's active
+        logger.info("[net..._manager.py][Action] Bringing down hotspot before connecting to WiFi...")
+        subprocess.run(["nmcli", "con", "down", "hotspot"], check=False)
+        sleep(3)
+        
+        # Check if a connection profile already exists for this SSID
+        logger.info(f"[net..._manager.py][Action] Checking for existing connection to {ssid}...")
+        check_result = subprocess.run(
+            ["nmcli", "-t", "-f", "NAME", "con", "show"],
+            capture_output=True,
+            text=True
+        )
+        
+        connection_exists = ssid in check_result.stdout
+        
+        if not connection_exists:
+            # Create new connection profile with explicit WPA-PSK security
+            logger.info(f"[net..._manager.py][Action] Creating new connection profile for {ssid}...")
+            add_result = subprocess.run([
+                "nmcli", "con", "add",
+                "type", "wifi",
+                "con-name", ssid,
+                "ifname", "wlan0",
+                "ssid", ssid,
+                "wifi-sec.key-mgmt", "wpa-psk",
+                "wifi-sec.psk", password
+            ], capture_output=True, text=True)
+            
+            if add_result.returncode != 0:
+                logger.error(f"[net..._manager.py][Error] Failed to create connection: {add_result.stderr}")
+                return False, f"Failed to create connection profile: {add_result.stderr}"
+            
+            sleep(2)
+        else:
+            logger.info(f"[net..._manager.py][Action] Connection profile exists, will activate it...")
+        
+        # Now activate the connection
+        logger.info(f"[net..._manager.py][Action] Activating connection to {ssid}...")
+        result = subprocess.run(
+            ["nmcli", "con", "up", ssid],
+            capture_output=True,
+            text=True
+        )
+        
         # Wait for connection to stabilize
         sleep(10)
-        # If it could not connect to user provided SSID ...
+        
+        # Check if connection succeeded
         if not NetworkManager.is_connected_to_wifi():
-            return False, f"Failed to connect to {ssid}"
+            logger.error(f"[net..._manager.py][Result] Failed to connect to {ssid}")
+            logger.error(f"[net..._manager.py][Result] nmcli stdout: {result.stdout}")
+            logger.error(f"[net..._manager.py][Result] nmcli stderr: {result.stderr}")
+            return False, f"Failed to connect to {ssid}: {result.stderr}"
 
-        # If it could connect to user provided SSID ...
+        # Success
+        logger.info(f"[net..._manager.py][Result] Successfully connected to {ssid}")
         return True, f"Connected successfully to {ssid}"
     
 

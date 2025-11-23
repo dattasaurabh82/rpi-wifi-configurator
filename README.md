@@ -9,7 +9,7 @@
 - [x] Clean exit
 - [ ] Add "permission issues with PolicyKit for Debian Trixie" (for non-sudo usage) methods in install script ... 
 - [ ] 
-- [ ] uninstall script
+- [x] uninstall script
 - [ ] Check `http://link_to_install_script | sh` efforts
 
 ---

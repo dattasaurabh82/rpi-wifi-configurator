@@ -677,6 +677,18 @@ setup_systemd_service() {
         return 0
     fi
     
+    # Ensure XDG_RUNTIME_DIR is set (needed for systemd --user over SSH)
+    if [ -z "$XDG_RUNTIME_DIR" ]; then
+        export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+        print_info "Set XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR"
+    fi
+    
+    # Ensure D-Bus session address is set
+    if [ -z "$DBUS_SESSION_BUS_ADDRESS" ]; then
+        export DBUS_SESSION_BUS_ADDRESS="unix:path=$XDG_RUNTIME_DIR/bus"
+        print_info "Set DBUS_SESSION_BUS_ADDRESS"
+    fi
+    
     # Check if setup_service.sh exists
     if [ ! -f "$INSTALL_DIR/setup_service.sh" ]; then
         print_error "setup_service.sh not found!"

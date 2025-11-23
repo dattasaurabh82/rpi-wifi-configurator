@@ -6,6 +6,7 @@ from time import sleep
 from led import LED
 import configparser
 import os
+import sys
 
 
 
@@ -129,8 +130,7 @@ def stop_server():
     if server_running:
         server_running = False
         logger.info("[web_server.py][Status] Stopping web server...")
-        socketio.stop()
-        sleep(2)
+        # Just exit - socketio.stop() doesn't work in thread context
         logger.info("[web_server.py][Result] Web server stopped.")
 
 

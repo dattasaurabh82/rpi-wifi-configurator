@@ -7,6 +7,7 @@ import time
 from logger import logger
 import configparser
 import os
+import sys
 
 
 # ------------------------------------------- #
@@ -17,7 +18,6 @@ import os
 config = configparser.ConfigParser()
 config_path = os.path.join(os.path.dirname(__file__), 'config.ini')
 
-# Read config if exists, otherwise use defaults
 # Read config if exists, otherwise use defaults
 if os.path.exists(config_path):
     config.read(config_path)
@@ -87,8 +87,6 @@ button.on_long_press = on_long_press
 # ------------------------------------------ #
 # -------- Process status signal LED ------- #
 # ------------------------------------------ #
-status_led = LED(pin=LED_PIN)
-# status_led = LED(pin=LED_PIN)
 status_led = LED(pin=LED_PIN, max_brightness=0.3)  # 30% brightness
 from wifi_config.web_server import init_app
 init_app(status_led)
@@ -98,8 +96,8 @@ init_app(status_led)
 def main():
     global server_thread, server_running
     
-    # Start the web server
-    server_thread = threading.Thread(target=run_server)
+    # Start the web server in daemon thread (exits when main thread exits)
+    server_thread = threading.Thread(target=run_server, daemon=True)
     server_thread.start()
     server_running = True
     
@@ -107,22 +105,27 @@ def main():
     last_known_ip = NetworkManager.get_current_ip()
     last_known_mode = "normal" if last_known_ip != AP_SELF_IP else "ap"
     
-    while True:
-        time.sleep(1)
-        current_ip = NetworkManager.get_current_ip()
-        
-        if NetworkManager.is_in_ap_mode():
-            if last_known_mode != "ap":
-                logger.info("[app.py][Action] Switched to AP mode.")
-                switch_to_ap_mode()
-                last_known_mode = "ap"
-        elif current_ip != AP_SELF_IP and NetworkManager.is_connected_to_wifi():
-            if last_known_mode != "normal":
-                logger.info("[app.py][Action] Connected to Wi-Fi. Switching to normal mode...")
-                switch_to_normal_mode()
-                last_known_mode = "normal"
-        
-        last_known_ip = current_ip
+    try:
+        while True:
+            time.sleep(1)
+            current_ip = NetworkManager.get_current_ip()
+            
+            if NetworkManager.is_in_ap_mode():
+                if last_known_mode != "ap":
+                    logger.info("[app.py][Action] Switched to AP mode.")
+                    switch_to_ap_mode()
+                    last_known_mode = "ap"
+            elif current_ip != AP_SELF_IP and NetworkManager.is_connected_to_wifi():
+                if last_known_mode != "normal":
+                    logger.info("[app.py][Action] Connected to Wi-Fi. Switching to normal mode...")
+                    switch_to_normal_mode()
+                    last_known_mode = "normal"
+            
+            last_known_ip = current_ip
+    except KeyboardInterrupt:
+        logger.info("[app.py][Result] Shutting down gracefully...")
+        status_led.cleanup()
+        sys.exit(0)
                 
 # ------------------------------------------ #
 
@@ -146,10 +149,4 @@ else:
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    except KeyboardInterrupt:
-        if server_running:
-            stop_server()
-        logger.info("[app.py][Result] Program stopped")
-
+    main()

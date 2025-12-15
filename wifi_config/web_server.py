@@ -89,6 +89,18 @@ def serve_image(filename):
     return app.send_static_file(f'images/{filename}')
 
 
+@socketio.on('scan_wifi')
+def handle_scan_wifi():
+    logger.info("[web_server.py][Action] WiFi scan requested")
+    try:
+        networks = NetworkManager.scan_wifi()
+        socketio.emit('scan_results', {'success': True, 'networks': networks})
+        logger.info(f"[web_server.py][Result] Sent {len(networks)} networks to client")
+    except Exception as e:
+        logger.error(f"[web_server.py][Error] Scan failed: {e}")
+        socketio.emit('scan_results', {'success': False, 'error': str(e)})
+
+
 @socketio.on('connect_wifi')
 def handle_connect_wifi(data):
     global is_ap_mode, last_connection_success

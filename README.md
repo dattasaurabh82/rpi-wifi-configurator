@@ -3,8 +3,9 @@
 ## TODO:
 
 - [x] Handle --- What if the desired WIFI doesn't have any PWD?
-- [ ] Better: Add scan to get all wifi details before connecting ... ?
+- [x] Better: Add scan to get all wifi details before connecting ... ?
 - [ ] Implement usage of config template ini vs hardcoded defaults 
+- [ ] New Impl.: when pi is connected, going to pi's ip:4000 should show curr wifi info 
 - [x] Add the correct IP address display ...
 - [x] Clean exit
 - [x] Add "permission issues with PolicyKit for Debian Trixie" (for non-sudo usage) methods in install script ... 

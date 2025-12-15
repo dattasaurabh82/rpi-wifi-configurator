@@ -72,7 +72,7 @@ class Logger:
         self.logger.critical(message)
 
 # Create a global logger instance
-logger = Logger('komorebi')
+logger = Logger('rpi-wifi-configurator')
 
 # Capture Flask and Werkzeug logs
 werkzeug_logger = logging.getLogger('werkzeug')

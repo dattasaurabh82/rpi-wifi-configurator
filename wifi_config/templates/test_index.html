@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="icon" type="image/png" sizes="32x32" href="../static/images/icons8-favicon-32.png">
+    <link rel="icon" type="image/png" sizes="64x64" href="../static/images/icons8-favicon-64.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="../static/images/icons8-favicon-96.png">
+
+    <title>RPI_NET_SETUP Wi-Fi Configuration</title>
+
+    <link rel="stylesheet" href="../static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>RPI_NET_SETUP Wi-Fi Configuration</h1>
+        
+        <button id="scan-btn" type="button">Scan Networks</button>
+        <div id="scan-results" class="scan-results hidden">
+            <ul id="network-list"></ul>
+        </div>
+        
+        <input type="text" id="network-name" placeholder="Enter network name (SSID)">
+        <div class="password-container">
+            <input type="password" id="password" placeholder="Enter password">
+            <button id="toggle-password" type="button">👀</button>
+        </div>
+        <button id="connect-btn">Connect</button>
+        <div id="status"></div>
+    </div>
+
+    <!-- Socket.IO removed for local testing -->
+    <script>
+        // Minimal JS for testing UI interactions
+        const passwordInput = document.getElementById('password');
+        const togglePasswordBtn = document.getElementById('toggle-password');
+        const connectBtn = document.getElementById('connect-btn');
+        const statusDiv = document.getElementById('status');
+        const scanBtn = document.getElementById('scan-btn');
+        const scanResults = document.getElementById('scan-results');
+        const networkList = document.getElementById('network-list');
+        const networkNameInput = document.getElementById('network-name');
+
+        // Password toggle
+        togglePasswordBtn.addEventListener('click', () => {
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                togglePasswordBtn.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                togglePasswordBtn.textContent = '👀';
+            }
+        });
+
+        // Connect button
+        connectBtn.addEventListener('click', () => {
+            statusDiv.textContent = 'Connecting... (simulated)';
+        });
+
+        passwordInput.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                statusDiv.textContent = 'Connecting... (simulated)';
+            }
+        });
+
+        // Scan button - simulated data for local testing
+        scanBtn.addEventListener('click', () => {
+            scanBtn.textContent = 'Scanning...';
+            scanBtn.disabled = true;
+            
+            // Simulate delay
+            setTimeout(() => {
+                // Mock data for testing UI
+                const mockNetworks = [
+                    { ssid: 'MyHomeWifi', security: 'WPA2' },
+                    { ssid: 'Neighbor_5G', security: 'WPA2 WPA3' },
+                    { ssid: 'CoffeeShop', security: 'Open' },
+                    { ssid: 'FRITZ!Box 7590', security: 'WPA2' },
+                    { ssid: 'Vodafone-1234', security: 'WPA2' }
+                ];
+                
+                networkList.innerHTML = '';
+                mockNetworks.forEach(network => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span class="ssid">${network.ssid}</span><span class="security">${network.security}</span>`;
+                    li.dataset.ssid = network.ssid;
+                    li.dataset.security = network.security;
+                    li.addEventListener('click', () => {
+                        networkNameInput.value = network.ssid;
+                        scanResults.classList.add('hidden');
+                        passwordInput.focus();
+                    });
+                    networkList.appendChild(li);
+                });
+                
+                scanResults.classList.remove('hidden');
+                scanBtn.textContent = 'Scan Networks';
+                scanBtn.disabled = false;
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

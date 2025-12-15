@@ -15,6 +15,12 @@
 <body>
     <div class="container">
         <h1>{{ project_name }} Wi-Fi Configuration</h1>
+        
+        <button id="scan-btn" type="button">Scan Networks</button>
+        <div id="scan-results" class="scan-results hidden">
+            <ul id="network-list"></ul>
+        </div>
+        
         <input type="text" id="network-name" placeholder="Enter network name (SSID)">
         <div class="password-container">
             <input type="password" id="password" placeholder="Enter password">

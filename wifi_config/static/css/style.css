@@ -53,6 +53,71 @@ button:hover {
     font-weight: bold;
 }
 
+/* Scan results styling */
+.hidden {
+    display: none;
+}
+
+.scan-results {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+}
+
+.scan-results ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.scan-results li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0.8rem;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.15s;
+}
+
+.scan-results li:last-child {
+    border-bottom: none;
+}
+
+.scan-results li:hover {
+    background-color: #e8f5e9;
+}
+
+.scan-results .ssid {
+    font-weight: 500;
+    color: #333;
+}
+
+.scan-results .security {
+    font-size: 0.8rem;
+    color: #666;
+    background-color: #f0f0f0;
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+}
+
+#scan-btn {
+    background-color: #2196F3;
+    margin-bottom: 0.5rem;
+}
+
+#scan-btn:hover {
+    background-color: #1976D2;
+}
+
+#scan-btn:disabled {
+    background-color: #90CAF9;
+    cursor: wait;
+}
+
 .password-container {
     position: relative;
 }

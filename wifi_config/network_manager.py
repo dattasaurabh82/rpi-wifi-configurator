@@ -26,6 +26,7 @@ class NetworkManager:
             parts = line.rsplit(':', 1)
             if len(parts) == 2:
                 ssid = parts[0].strip()
+                ssid = ssid.replace('\\:', ':')  # Unescape nmcli's escaped colons, iof there's say some spl funky SSID
                 security = parts[1].strip() if parts[1].strip() else "Open"
                 
                 # Skip empty SSIDs and duplicates

@@ -4,6 +4,42 @@ from logger import logger
 
 class NetworkManager:
     @staticmethod
+    def scan_wifi():
+        """Scan for available WiFi networks and return list of {ssid, security} dicts"""
+        logger.info("[net..._manager.py][Action] Scanning for WiFi networks...")
+        
+        # Use terse output for easier parsing: SSID:SECURITY
+        result = subprocess.run(
+            ["nmcli", "-t", "-f", "SSID,SECURITY", "dev", "wifi", "list", "--rescan", "yes"],
+            capture_output=True,
+            text=True
+        )
+        
+        networks = []
+        seen_ssids = set()
+        
+        for line in result.stdout.strip().split('\n'):
+            if not line:
+                continue
+            
+            # Format is SSID:SECURITY (but SSID could contain colons, so split from right)
+            parts = line.rsplit(':', 1)
+            if len(parts) == 2:
+                ssid = parts[0].strip()
+                security = parts[1].strip() if parts[1].strip() else "Open"
+                
+                # Skip empty SSIDs and duplicates
+                if ssid and ssid not in seen_ssids:
+                    seen_ssids.add(ssid)
+                    networks.append({"ssid": ssid, "security": security})
+        
+        # Sort by SSID name (case-insensitive)
+        networks.sort(key=lambda x: x["ssid"].lower())
+        
+        logger.info(f"[net..._manager.py][Result] Found {len(networks)} unique networks")
+        return networks
+
+    @staticmethod
     def setup_ap():
         logger.info("[net..._manager.py][Result] Turning predefined AP down, even though it maybe down... [wait 5 sec ...]")
         subprocess.run(["nmcli", "con", "down", "hotspot"], check=False)

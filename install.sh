@@ -670,7 +670,8 @@ create_nm_hotspot() {
     if [ -n "$CURRENT_CONNECTION" ]; then
         print_info "Reconnecting to WiFi..."
         sleep 2
-        sudo nmcli con up "$CURRENT_CONNECTION" > /dev/null 2>&1
+        # sudo nmcli con up "$CURRENT_CONNECTION" > /dev/null 2>&1
+        sudo nmcli con up "$CURRENT_CONNECTION" > /dev/null 2>&1 || true
         print_success "Reconnected to: $CURRENT_CONNECTION"
     fi
 }

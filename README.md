@@ -85,6 +85,9 @@ wget -qO- https://raw.githubusercontent.com/dattasaurabh82/rpi-wifi-configurator
 
 or
 
+> [!Note]
+> If there's an update to the repo you can just do the below
+
 ```bash
 git clone https://github.com/dattasaurabh82/rpi-wifi-configurator.git
 cd rpi-wifi-configurator

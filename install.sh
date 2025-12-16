@@ -632,7 +632,8 @@ create_nm_hotspot() {
     CURRENT_CONNECTION=$(nmcli -t -f NAME con show --active | grep -v '^lo$' | head -n1 || true)
     
     if [ -n "$CURRENT_CONNECTION" ]; then
-        sudo nmcli con down "$CURRENT_CONNECTION" > /dev/null 2>&1
+        # sudo nmcli con down "$CURRENT_CONNECTION" > /dev/null 2>&1
+        sudo nmcli con down "$CURRENT_CONNECTION" > /dev/null 2>&1 || true
         print_success "Disconnected from: $CURRENT_CONNECTION"
         sleep 3
     fi

@@ -628,7 +628,8 @@ create_nm_hotspot() {
     
     # Temporarily disconnect from WiFi to allow hotspot creation
     print_info "Temporarily disconnecting from WiFi..."
-    CURRENT_CONNECTION=$(nmcli -t -f NAME con show --active | grep -v '^lo$' | head -n1)
+    # CURRENT_CONNECTION=$(nmcli -t -f NAME con show --active | grep -v '^lo$' | head -n1)
+    CURRENT_CONNECTION=$(nmcli -t -f NAME con show --active | grep -v '^lo$' | head -n1 || true)
     
     if [ -n "$CURRENT_CONNECTION" ]; then
         sudo nmcli con down "$CURRENT_CONNECTION" > /dev/null 2>&1

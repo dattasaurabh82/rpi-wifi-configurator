@@ -83,8 +83,6 @@ or
 wget -qO- https://raw.githubusercontent.com/dattasaurabh82/rpi-wifi-configurator/main/install.sh | bash
 ```
 
-or
-
 > [!Note]
 > If there's an update to the repo you can just do the below
 
@@ -93,6 +91,13 @@ git clone https://github.com/dattasaurabh82/rpi-wifi-configurator.git
 cd rpi-wifi-configurator
 ./install.sh
 ```
+
+<br>
+
+DEMO:
+
+[![asciicast](https://asciinema.org/a/762256.svg)](https://asciinema.org/a/762256)
+
 
 The installer will:
 - Check system requirements

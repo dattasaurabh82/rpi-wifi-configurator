@@ -9,7 +9,7 @@
 - [x] Add "permission issues with PolicyKit for Debian Trixie" (for non-sudo usage) methods in install script ... 
 - [x] LED show status if pi can;t find wifi after boot
 - [x] uninstall script
-- [ ] Check `http://link_to_install_script | sh` efforts
+- [x] Check `http://link_to_install_script | sh` efforts
 - [ ] New Impl.: when pi is connected, going to pi's ip:4000 should show curr wifi info 
 
 ---
@@ -72,6 +72,18 @@ It will then disable the self initiated AP and connect to the provided SSID. If 
 
 
 ## Quick Installation - Automated Setup (Recommended)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/dattasaurabh82/rpi-wifi-configurator/main/install.sh | bash
+```
+
+or 
+
+```bash
+wget -qO- https://raw.githubusercontent.com/dattasaurabh82/rpi-wifi-configurator/main/install.sh | bash
+```
+
+or
 
 ```bash
 git clone https://github.com/dattasaurabh82/rpi-wifi-configurator.git

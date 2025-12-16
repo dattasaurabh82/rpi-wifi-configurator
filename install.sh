@@ -90,6 +90,11 @@ bootstrap_if_needed() {
 # Run bootstrap check
 bootstrap_if_needed
 
+# Restore stdin for interactive prompts (needed when piped via curl | bash)
+if [ -t 0 ] || [ -e /dev/tty ]; then
+    exec < /dev/tty
+fi
+
 # ============================================
 # Color codes for output
 # ============================================

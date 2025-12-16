@@ -2,8 +2,93 @@
 
 # RPi WiFi Configurator - Installation Script
 # This script automates the setup of the WiFi configurator service
+#
+# Supports two modes:
+# 1. curl/wget pipe: curl -fsSL https://raw.githubusercontent.com/dattasaurabh82/rpi-wifi-configurator/main/install.sh | bash
+# 2. Local run: git clone ... && cd rpi-wifi-configurator && ./install.sh
 
 set -e  # Exit on any error
+
+# ============================================
+# Bootstrap section (handles curl | bash)
+# ============================================
+
+RPi_WIFI_REPO="https://github.com/dattasaurabh82/rpi-wifi-configurator.git"
+RPi_WIFI_DIR="$HOME/rpi-wifi-configurator"
+
+bootstrap_if_needed() {
+    # Check if we're running from within the repo (local mode)
+    # by looking for key files that should exist in the repo
+    local script_dir
+    script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}" 2>/dev/null)" && pwd 2>/dev/null)" || script_dir=""
+    
+    # If we can't determine script_dir (piped) or key files don't exist, we need to bootstrap
+    if [ -z "$script_dir" ] || [ ! -f "$script_dir/app.py" ] || [ ! -f "$script_dir/requirements.txt" ]; then
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "  RPi WiFi Configurator - Bootstrap Installer"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo ""
+        
+        # Check for git
+        if ! command -v git &> /dev/null; then
+            echo "ERROR: git is required but not installed."
+            echo "Install with: sudo apt-get install git"
+            exit 1
+        fi
+        
+        # Check if target directory already exists
+        if [ -d "$RPi_WIFI_DIR" ]; then
+            echo "Directory $RPi_WIFI_DIR already exists."
+            echo ""
+            echo "Options:"
+            echo "  [1] Update existing and run installer"
+            echo "  [2] Remove and fresh clone"
+            echo "  [3] Exit"
+            echo ""
+            read -p "Choice [1]: " choice
+            choice=${choice:-1}
+            
+            case $choice in
+                1)
+                    echo "Updating existing repository..."
+                    cd "$RPi_WIFI_DIR"
+                    git pull origin main || { echo "Git pull failed"; exit 1; }
+                    ;;
+                2)
+                    echo "Removing existing directory..."
+                    rm -rf "$RPi_WIFI_DIR"
+                    echo "Cloning repository to $RPi_WIFI_DIR ..."
+                    git clone "$RPi_WIFI_REPO" "$RPi_WIFI_DIR" || { echo "Git clone failed"; exit 1; }
+                    cd "$RPi_WIFI_DIR"
+                    ;;
+                3)
+                    echo "Exiting."
+                    exit 0
+                    ;;
+                *)
+                    echo "Invalid choice"
+                    exit 1
+                    ;;
+            esac
+        else
+            echo "Cloning repository to $RPi_WIFI_DIR ..."
+            git clone "$RPi_WIFI_REPO" "$RPi_WIFI_DIR" || { echo "Git clone failed"; exit 1; }
+            cd "$RPi_WIFI_DIR"
+        fi
+        
+        echo ""
+        echo "Running installer from cloned repository..."
+        echo ""
+        
+        # Execute the local install.sh (now we're in the repo)
+        exec bash "$RPi_WIFI_DIR/install.sh"
+    fi
+    
+    # If we reach here, we're running locally from within the repo - continue normally
+}
+
+# Run bootstrap check
+bootstrap_if_needed
 
 # ============================================
 # Color codes for output

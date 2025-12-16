@@ -96,7 +96,7 @@ cd rpi-wifi-configurator
 
 DEMO:
 
-[![asciicast](https://asciinema.org/a/762256.svg)](https://asciinema.org/a/762256)
+![alt text](assets/setup.gif)
 
 
 The installer will:

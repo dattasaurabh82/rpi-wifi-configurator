@@ -1,19 +1,5 @@
 # README
 
-## TODO:
-
-- [x] Handle --- What if the desired WIFI doesn't have any PWD?
-- [x] Better: Add scan to get all wifi details before connecting ... ?
-- [x] Add the correct IP address display ...
-- [x] Clean exit
-- [x] Add "permission issues with PolicyKit for Debian Trixie" (for non-sudo usage) methods in install script ... 
-- [x] LED show status if pi can;t find wifi after boot
-- [x] uninstall script
-- [x] Check `http://link_to_install_script | sh` efforts
-- [ ] New Impl.: when pi is connected, going to pi's ip:4000 should show curr wifi info 
-
----
-
 I never found a simple utility that headless-ly allows setting up wifi to a pi, without logging into it with a monitor and keyboard or pre-configuring it prior to setup with the wifi credentials. What if you can't use ethernet? Anf, what if you are using it in an installation or a setup where you can't be there and someone who is there doesn't know anything about SSH or is not into Linux? 
 
 Well I have a solution.. (Behold)
@@ -24,7 +10,7 @@ You can then connect to that Access Point (Check out how to customize that below
 
 It will then disable the self initiated AP and connect to the provided SSID. If all goes well and the credentials were, correct, it will connect successfully.
 
-![How Pi configurator works](assets/how_pi_configurator_works.png)
+![How Pi configuration works](assets/how_pi_configurator_works.png)
 
 ---
 
@@ -288,9 +274,9 @@ Long Press → FAST_BLINK (AP mode active)
 
 ```text
 Saurabh Datta
-zigzag.is [Principal Designer]
-Berlin
-January 2025 (2nd iteration, Dec 2025)
+[Principal Designer + Creative Technologist]
+Berlin, January 2025 (2nd iteration, Dec 2025)
 hi@dattasaurabh.com
+datta@zigzag.is
 ```
 

@@ -1,5 +1,19 @@
 # README
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Platform: Raspberry Pi](https://img.shields.io/badge/platform-Raspberry%20Pi-c51a4a.svg)](https://www.raspberrypi.org/)
+[![Python 3](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+
+<p align="left">
+  If you find this project useful, consider supporting its development <br><br>
+  <a href="https://github.com/sponsors/dattasaurabh82">
+    <img src="https://img.shields.io/badge/Sponsor-❤-ea4aaa?style=for-the-badge&logo=github" alt="Sponsor on GitHub">
+  </a>
+  <a href="https://buymeacoffee.com/dattasaurabh82">
+    <img src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" alt="Buy Me a Coffee">
+  </a>
+</p>
+
 I never found a simple utility that headless-ly allows setting up wifi to a pi, without logging into it with a monitor and keyboard or pre-configuring it prior to setup with the wifi credentials. What if you can't use ethernet? Anf, what if you are using it in an installation or a setup where you can't be there and someone who is there doesn't know anything about SSH or is not into Linux? 
 
 Well I have a solution.. (Behold)
